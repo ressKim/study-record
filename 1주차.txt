@@ -1,6 +1,0 @@
-JVM 메모리 구조(작성중)
-https://www.notion.so/JVM-0b0cbbe312b0497898937fa2d98d7182
-
-추상 클래스와 인터페이스를 언제 사용할까?(미작성)
-
-Java Collection 이란?(미작성)

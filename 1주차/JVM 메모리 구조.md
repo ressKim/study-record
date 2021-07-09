@@ -9,7 +9,7 @@
 
 ### Runtime 시의 JVM 구조
 
-![jvmImg/jvm-runtime.png](jvmImg/jvm-runtime.png)
+![JVM-Runtime.svg](jvmImg/JVM-Runtime.svg)
 
 위쪽부터 실행 순서대로 보면
 
@@ -23,11 +23,12 @@
 
 ### JVM Memory 구조
 
-![jvmImg/Runtime_Data_Area.svg](jvmImg/Runtime_Data_Area.svg)
+![Runtime_Data_Area.svg](jvmImg/Runtime_Data_Area.svg)
 
 Runtime Data Area
 
 - JVM 의 메모리 영역으로 자바 어플리케이션을 실행할 때 사용되는 데이터들이 적재되는 영역이다.
+
 1. Method area(메소드 영역)
     - 모든 Thread 에 공유 됨
     - Class Loader 가 적재한  클래스(또는 인터페이스) 에 대한 메타데이터 정보가 저장된다.
@@ -37,20 +38,22 @@ Runtime Data Area
 
 2. Heap area(힙 영역)
     - 모든 Thread 에 공유 됨
-    - 동적 데이터가 할당되어 저장된다.
+    - 동적 데이터가 할당되어 저장된다.(new 명령으로 만드는거는 다 여기 해당한다고 보면 된다.)
     - GC의 동작 대상이며 레퍼런스(참조)가 없는 객체들은 GC동작 과정에 따라 메모리에서 제거된다.
     - Heap 영역은 크게 Eden(Young Generation), Survivor 1 & 2(Young Generation), Old(tenured generation), Permanent(JDK 8부터 삭제되고, 이 기능을 Metaspace 가 함)
+    - 하단에 자세하게 설명
 
 3. Stack Area(스택 영역)
     - Thread 별로 1개씩 존재
     - 자바에서 메소드를 호출할 때 메소드의 Stack Frame 이 저장되는 영역
     - Stack Area 에 저장되는 변수는 기본자료형(int, double, long, float), 참조자료형(주소값)
     - ** 메소드 호출이 끝나면 Stack 내 메소드 관련 지역변수도 지워지기 때문에  메소드 영역 밖에서는 사용할수 없는 이유가 된다.
+
     - stack area 의 동작과정
-    1. 자바는 스레드를 생성하지 않았다면 main 스레드만 존재하고 그에 따라 stack frame도 한개만 있다.
-    2. 그 과정에서 메서드를 호출하면 stack프레임을 하나 새로 생성(push)된다
-    3. 그리고 그 안에 메서드와 관계된 지역변수, 매개변수 등을 스택 영역에 저장한다.
-    4. 이렇게 스택 영역은 메소드의 호출과 함께 할당되고 메소드의 호출이 완료되면 소멸(pop)한다.
+        1. 자바는 스레드를 생성하지 않았다면 main 스레드만 존재하고 그에 따라 stack frame도 한개만 있다.
+        2. 그 과정에서 메서드를 호출하면 stack프레임을 하나 새로 생성(push)된다
+        3. 그리고 그 안에 메서드와 관계된 지역변수, 매개변수 등을 스택 영역에 저장한다.
+        4. 이렇게 스택 영역은 메소드의 호출과 함께 할당되고 메소드의 호출이 완료되면 소멸(pop)한다.
 
 4. PC Resisters(PC 레지스터)
     - Thread 별로 1개씩 존재
@@ -62,12 +65,32 @@ Runtime Data Area
     - JNI(Java Native Interface) 를 통해 호출되는 C/C++ 등의 코드를 실행가기 위함
     - JVM 내부에 영향을 주지 않기 위해 따로 메모리 공간을 활용함
 
-    참조 :
+## +Heap 영역
 
-    [https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html](https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html)
+([https://sgcomputer.tistory.com/64](https://sgcomputer.tistory.com/64) 참조)
 
-    [https://sgcomputer.tistory.com/64](https://sgcomputer.tistory.com/64)
+![Java-Memory-Model-450x186.png](jvmImg/Java-Memory-Model-450x186.png)
 
-    [https://yaboong.github.io/java/2018/05/26/java-memory-management/](https://yaboong.github.io/java/2018/05/26/java-memory-management/)
+1. Eden(Young Generation)
+    - 객체가 생성되면 처음 저장되는 공간으로, Eden의 공간이 다 차게되면 해당 데이터는 Survivor 1로 복사가 되는데 이 때 쓸모없는 데이터는 Minor GC에 의해 삭제된다.
+2.  Survivor 1 & 2(Young Generation)
+    - Eden에서 살아남은 데이터가 옮겨진다.
+    - Survivor 영역이 꽉 차게 되면 다른 Survivor 영역으로 이동하게 된다. 이 때, Eden 영역에 있는 객체들 중 살아있는 객체들도 다른 Survivor 영역으로 간다. 즉, Survivor 영역의 둘 중 하나는 반드시 비어 있어야 한다.
+    - 이렇게 이동하면서 쓸모 없는 데이터는 Minor GC 에 의해 삭제되고 오래 살아있는 데이터는 Old 로 데이터를 보낸다
+3. Old(tenured generation)
+    - Young Generation(Survivor영역) 에서 오래 살아남은 객체가 저장되는 곳
+    - 보통 굉장히 오래 사용하고, 크기가 큰 객체가 대부분이며 여기 Old 의 공간이 다 차게되면 Minor 가 아닌 Major GC 가 실행된다.
+    - Major GC 는 객체들이 살아있는 여부를 파악하기위해서 모든 쓰레드의 실행을 멈추고 heap을 정리하기 때문에 자원과 시간을 많이 소모한다.
+4. Permanent
+    - JDK8버전부터 삭제됨.
+    - Meta Space 영역이 되어서 Native영역으로 관리가 넘어갔다.(단, static Object 는 Heap 영역으로 옮겨졌다)
 
-    [https://velog.io/@jsj3282/JVM과-자바-메모리-구조Runtime-Data-Area](https://velog.io/@jsj3282/JVM%EA%B3%BC-%EC%9E%90%EB%B0%94-%EB%A9%94%EB%AA%A8%EB%A6%AC-%EA%B5%AC%EC%A1%B0Runtime-Data-Area)
+참조 :
+
+[https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html](https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html)
+
+[https://sgcomputer.tistory.com/64](https://sgcomputer.tistory.com/64)
+
+[https://yaboong.github.io/java/2018/05/26/java-memory-management/](https://yaboong.github.io/java/2018/05/26/java-memory-management/)
+
+[https://velog.io/@jsj3282/JVM과-자바-메모리-구조Runtime-Data-Area](https://velog.io/@jsj3282/JVM%EA%B3%BC-%EC%9E%90%EB%B0%94-%EB%A9%94%EB%AA%A8%EB%A6%AC-%EA%B5%AC%EC%A1%B0Runtime-Data-Area)

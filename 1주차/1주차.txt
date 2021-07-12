@@ -1,8 +1,8 @@
-JVM 메모리 구조(GC 관련 추가 글 작성 필요)
+JVM 메모리 구조(작성중)
 https://www.notion.so/JVM-0b0cbbe312b0497898937fa2d98d7182
 
 추상 클래스와 인터페이스를 언제 사용할까?
 https://www.notion.so/9d0fff3b5bed4b2f97b46520c90f4560
 
-Collection 이란?
-- concurrent collection 은 왜 필요하고 어떨 때 쓰일까?
+Collection 에서의 Synchronization
+https://www.notion.so/Collection-Synchronization-6ed1bb00da904241bd0e028a679bdce0

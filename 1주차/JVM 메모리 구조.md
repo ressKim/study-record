@@ -69,8 +69,13 @@ Runtime Data Area
 
 ([https://sgcomputer.tistory.com/64](https://sgcomputer.tistory.com/64) 참조)
 
+![java8-memory-structor.jpeg](jvmImg/java8-memory-structor.jpeg)
+
+(아래 이미지는 java 1.7의 힙 구조임)
+
 ![Java-Memory-Model-450x186.png](jvmImg/Java-Memory-Model-450x186.png)
 
+- java 1.8 부터 perm 이 Metaspace 영역으로 넘어갔다.(단, static Object 는 Heap 영역으로 옮겨졌다) metaspace 는 아래에 나누어서 또 설명하도록 해보자
 1. Eden(Young Generation)
     - 객체가 생성되면 처음 저장되는 공간으로, Eden의 공간이 다 차게되면 해당 데이터는 Survivor 1로 복사가 되는데 이 때 쓸모없는 데이터는 Minor GC에 의해 삭제된다.
 2.  Survivor 1 & 2(Young Generation)
@@ -78,12 +83,26 @@ Runtime Data Area
     - Survivor 영역이 꽉 차게 되면 다른 Survivor 영역으로 이동하게 된다. 이 때, Eden 영역에 있는 객체들 중 살아있는 객체들도 다른 Survivor 영역으로 간다. 즉, Survivor 영역의 둘 중 하나는 반드시 비어 있어야 한다.
     - 이렇게 이동하면서 쓸모 없는 데이터는 Minor GC 에 의해 삭제되고 오래 살아있는 데이터는 Old 로 데이터를 보낸다
 3. Old(tenured generation)
-    - Young Generation(Survivor영역) 에서 오래 살아남은 객체가 저장되는 곳
-    - 보통 굉장히 오래 사용하고, 크기가 큰 객체가 대부분이며 여기 Old 의 공간이 다 차게되면 Minor 가 아닌 Major GC 가 실행된다.
-    - Major GC 는 객체들이 살아있는 여부를 파악하기위해서 모든 쓰레드의 실행을 멈추고 heap을 정리하기 때문에 자원과 시간을 많이 소모한다.
-4. Permanent
-    - JDK8버전부터 삭제됨.
-    - Meta Space 영역이 되어서 Native영역으로 관리가 넘어갔다.(단, static Object 는 Heap 영역으로 옮겨졌다)
+   - Young Generation(Survivor영역) 에서 오래 살아남은 객체가 저장되는 곳
+   - 보통 굉장히 오래 사용하고, 크기가 큰 객체가 대부분이며 여기 Old 의 공간이 다 차게되면 Minor 가 아닌 Major GC 가 실행된다.
+   - Major GC 는 객체들이 살아있는 여부를 파악하기위해서 모든 쓰레드의 실행을 멈추고 heap을 정리하기 때문에 자원과 시간을 많이 소모한다.
+
+## java 8 에서 변경점(Permanent Generation 이 사라지고 Metaspace 가 추가)
+
+![Java8-heap-500x297.jpeg](jvmImg/Java8-heap.jpeg)
+
+### Permanent Generation 의 특징
+
+- Class 메타 데이터 저장
+- Method 메타 데이터 저장
+- static object 변수, 상수 저장
+- Heap 영역
+
+### Java 8 에서 어떻게 변경되었는가
+
+- Perm 에서의 대부분의 기능이 Metaspace 로 넘어갔지만, 'Static Object 변수, 상수' 부분은 Heap 영역으로 이동해서 GC 의 대상이 될 수 있도록 되었다.
+- Metaspace 는 Native Memory 영역이다.(Heap 영역은 JVM 에 관리되고, Native memory 는 OS 레벨에서 관리하는 영역이다)
+- metaspace 로 이동함으로써 메모리 영역 확보의 상한을 크게 의식할 필요가 없어지게 되었다.
 
 참조 :
 
@@ -94,3 +113,21 @@ Runtime Data Area
 [https://yaboong.github.io/java/2018/05/26/java-memory-management/](https://yaboong.github.io/java/2018/05/26/java-memory-management/)
 
 [https://velog.io/@jsj3282/JVM과-자바-메모리-구조Runtime-Data-Area](https://velog.io/@jsj3282/JVM%EA%B3%BC-%EC%9E%90%EB%B0%94-%EB%A9%94%EB%AA%A8%EB%A6%AC-%EA%B5%AC%EC%A1%B0Runtime-Data-Area)
+
+[https://medium.com/platform-engineer/understanding-java-memory-model-1d0863f6d973](https://medium.com/platform-engineer/understanding-java-memory-model-1d0863f6d973)
+
+[https://johngrib.github.io/wiki/java8-why-permgen-removed/](https://johngrib.github.io/wiki/java8-why-permgen-removed/)
+
+(java 7, 8 memory 영역 변경점 참조)
+
+(metadata 부분 관련 참조)
+
+[http://karunsubramanian.com/websphere/one-important-change-in-memory-management-in-java-8/](http://karunsubramanian.com/websphere/one-important-change-in-memory-management-in-java-8/)
+
+[https://goodgid.github.io/Java-8-JVM-Metaspace/](https://goodgid.github.io/Java-8-JVM-Metaspace/)
+
+[https://www.whatap.io/ko/blog/57/](https://www.whatap.io/ko/blog/57/)
+
+(out of memory error 관련)OOEM
+
+[https://m.post.naver.com/viewer/postView.naver?volumeNo=23726161&memberNo=36733075](https://m.post.naver.com/viewer/postView.naver?volumeNo=23726161&memberNo=36733075)

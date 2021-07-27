@@ -42,10 +42,14 @@
 
 # Inmemory DB
 
+![multi-session-img/in-memory.png](multi-session-img/in-memory.png)
+
+(출처 : [https://junshock5.tistory.com/84](https://junshock5.tistory.com/84))
+
 - 기존 서버가 가지고 있는 세션 저장소를 이용하는 것이 아니라, 별도의 세션 저장소를 사용하는것.
 - 데이터 저장소의 메인 메모리에 설치되어 운영되는 방식의 DB 이다.
 - 메모리 접근이기때문에 디스크 접근보다 빠르다.
-- memcached , Redis 등이 있는데 Redis가 더 빠르다.
+- memcached , Redis 등이 있는데 Redis가 더 빠르다
 
 ### 단점
 
